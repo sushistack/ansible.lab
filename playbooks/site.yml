@@ -1,0 +1,38 @@
+- name: Configure Web Server with Nginx
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Deploy Nginx configuration
+      template:
+        src: ../templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: Restart nginx
+
+    - name: Ensure Nginx is running
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Send Slack notification
+      uri:
+        url: "{{ slack_webhook }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          text: "✅ Nginx has been configured and restarted on {{ inventory_hostname }}."
+
+  handlers:
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
