@@ -1,0 +1,8 @@
+{
+  "name": "Ansible Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {},
+  "postCreateCommand": "ansible --version"
+}
